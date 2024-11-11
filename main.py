@@ -1,7 +1,5 @@
 import requests, datetime
-file = open('hello.txt')
-hellotext = file.read()
-file.close()
+
 a = 0
 
 url = {
@@ -11,15 +9,15 @@ url = {
 }
 Params = {
     'getUpdates':{"offset":0},
-    'start':{"chat_id":0, "text":0, "reply_markup": {"inline_keyboard": [
+    'start':{"chat_id":0, "text":"Hello, I`m your personal weather☀️.I can tell you actual, and future weather. Let`s set up your bot: ", "reply_markup": {"inline_keyboard": [
       [
         {
-          "text": "Seting",
+          "text": "Seting⚙️",
           "callback_data":"Seting"
         }
       ]
     ]}},
-    'day':{"chat_id":0, "text":0, "reply_markup": {"inline_keyboard": [
+    'day':{"chat_id":0, "text":"For what day you wanna learn forecast?📆", "reply_markup": {"inline_keyboard": [
       [
         {
           "text": "Monday",
@@ -66,31 +64,30 @@ def listen (answ):
       requests.post(url['getUpdates'], json = Params["getUpdates"])
 
       if 'message' in message['result'][0]:
-        
         return 'text', message['result'][0]['message']['text'], message['result'][0]['message']['chat']['id']
-      elif 'callback_query' in message['result'][0]:
       
+      elif 'callback_query' in message['result'][0]:
         return 'data', message['result'][0]['callback_query']['data'], message['result'][0]['callback_query']['message']['chat']['id']
+      
     return -1, -1, -1
 
 def start (chat_id):
     Params['start']['chat_id']=chat_id
-    Params['start']['text']=hellotext
     r = requests.post(url['sendMessage'], json=Params['start'])
 
 def weather_data(day,index , chat_id):
     weather = requests.get(url['getWeather'], params=Params['getWeather'])
     weather = weather.json()
     Params['forecast']['chat_id'] = chat_id
-    Params['forecast']['text'] = 'Weather forecast for {0}. \n Max temperature : {1}. \n Min temperature: {2}. \n Rain sum: {3}. \n Shower sum: {4}. \n Snowfall sum {5}. \n Wind directhion {6}. \n Max wind speed {7}. '.format(day, weather['daily']['temperature_2m_max'][index], weather['daily']['temperature_2m_min'][index], weather['daily']['rain_sum'][index], weather['daily']['showers_sum'][index], weather['daily']['snowfall_sum'][index], weather['daily']['wind_direction_10m_dominant'][index], weather['daily']['wind_speed_10m_max'][index] )
-                                    
+    Params['forecast']['text'] = 'Weather forecast for {0}. \n Max temperature🔥 : {1} °C. \n Min temperature❄️ : {2} °C. \n Rain sum🌧️ : {3} mm. \n Shower sum☔ : {4} mm. \n Snowfall sum🌨️ : {5} mm. \n Wind directhion🧭 : {6} °. \n Max wind speed🍃 : {7} km/h. '.format(day, weather['daily']['temperature_2m_max'][index], weather['daily']['temperature_2m_min'][index], weather['daily']['rain_sum'][index], weather['daily']['showers_sum'][index], weather['daily']['snowfall_sum'][index], weather['daily']['wind_direction_10m_dominant'][index], weather['daily']['wind_speed_10m_max'][index] )                      
     r = requests.post(url['sendMessage'], json=Params['forecast'])
-    print (r.json())
+
 def weather_message(chat_id):
     Params['day']['chat_id']=chat_id
     requests.post(url['sendMessage'], json=Params['day'])
+
 def setting(chat_id):
-    requests.post(url['sendMessage'], json={'text':'For quick start, enter your city cootdinates (example: 52.3 33.24)', 'chat_id':chat_id})
+    requests.post(url['sendMessage'], json={'text':'For quick start, enter your city cootdinates📍 (example: 52.3 33.24)', 'chat_id':chat_id})
     return 1
 
     
